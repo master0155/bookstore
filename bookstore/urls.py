@@ -20,8 +20,16 @@ from django.urls import path
 from django.urls import re_path
 from django.urls import include
 
+from django.urls import path, include, re_path
+
 urlpatterns = [
     path("admin/", admin.site.urls),
-    re_path('bookstore/(?P<version>(v1|v2))/', include('product.urls')),
-    re_path('bookstore/(?P<version>(v1|v2))/', include('order.urls')),
+
+    re_path(
+        r'^(?P<version>v1)/bookstore/',
+        include('product.urls')
+    ),
+
+    path('bookstore/', include('product.urls')),
+    path('bookstore/', include('order.urls')),
 ]

@@ -7,6 +7,7 @@ from product.serializers.category_serializer import CategorySerializer
 
 class ProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True, many=True)
+    price = serializers.FloatField()
     categories_id = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all(), write_only=True, many=True
     )

@@ -13,10 +13,10 @@ class UserFactory(factory.django.DjangoModelFactory):
         model = User
 
 class OrderFactory(factory.django.DjangoModelFactory):
-    user = factory.LazyAttribute(UserFactory)
+    user = factory.SubFactory(UserFactory)
 
     @factory.post_generation
-    def product(self, create, extracted, **kwargs):
+    def Product(self, create, extracted, **kwargs):
         if not create:
             return
 
