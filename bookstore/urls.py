@@ -21,8 +21,7 @@ from django.urls import path
 from django.urls import re_path
 from django.urls import include
 from django.conf import settings
-
-from django.urls import path, include, re_path
+from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -34,6 +33,7 @@ urlpatterns = [
 
     path('bookstore/', include('product.urls')),
     path('bookstore/', include('order.urls')),
+    path('api-token-auth/', obtain_auth_token),
 ]
 
 if settings.DEBUG:
