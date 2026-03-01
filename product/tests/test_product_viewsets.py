@@ -13,6 +13,7 @@ class TestProductViewSet(APITestCase):
 
     def setUp(self):
         self.user = UserFactory()
+        self.client.force_authenticate(user=self.user)
         self.product = ProductFactory(title='pro controller', price=200)
     
     def test_get_all_products(self):
@@ -21,14 +22,18 @@ class TestProductViewSet(APITestCase):
         response = self.client.get(reverse('product-list'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        product_data = json.loads(response.content)[0]
-        self.assertEqual(product_data['title'], product.title)
-        self.assertEqual(float(product_data['price']), float(product.price))
-        self.assertEqual(product_data['active'], product.active)
-        self.assertEqual(product_data['category'][0]['title'], category.title)
+        product_data = json.loads(response.content)
+        self.assertIn('results', product_data)
+        self.assertIsInstance(product_data['results'], list)
+        self.assertGreater(len(product_data['results']), 0)
+        first_product = product_data['results'][0]
+        self.assertEqual(first_product['title'], product.title)
+        self.assertEqual(float(first_product['price']), float(product.price))
+        self.assertEqual(first_product['active'], product.active)
+        self.assertEqual(first_product['category'][0]['title'], category.title)
 
     def test_create_product(self):
-        category =CategoryFactory()
+        category = CategoryFactory()
         data = json.dumps({
             'title': 'smartphone',
             'description': 'latest model',
