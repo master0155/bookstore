@@ -2,12 +2,11 @@ name: Python Pull Request Workflow
 
 on: [pull_request]
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   qa:
     name: Quality check
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
