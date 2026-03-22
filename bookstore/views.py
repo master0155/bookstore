@@ -5,8 +5,6 @@ from django.http import HttpResponse
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 
-import git
-
 
 @csrf_exempt
 def update(request):
@@ -16,10 +14,17 @@ def update(request):
     repo_path = os.environ.get("REPO_PATH", str(settings.BASE_DIR))
 
     try:
+        import git
+
         repo = git.Repo(repo_path)
         origin = repo.remotes.origin
         origin.pull()
         return HttpResponse("Updated code on PythonAnywhere")
+    except ModuleNotFoundError:
+        return HttpResponse(
+            "Update failed: GitPython is not installed. Run 'poetry install' on the server.",
+            status=500,
+        )
     except Exception as exc:
         return HttpResponse(f"Update failed: {exc}", status=500)
 
