@@ -1,3 +1,6 @@
+import os
+
+from django.conf import settings
 from django.http import HttpResponse
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
@@ -7,19 +10,18 @@ import git
 
 @csrf_exempt
 def update(request):
-    if request.method == "POST":
-        '''
-        pass the path of the diectory where your project will be
-        stored on PythonAnywhere in the git.Repo() as parameter.
-        Here the name of my directory is "test.pythonanywhere.com"
-        '''
-        repo = git.Repo('/home/drsantos20/bookstore')
-        origin = repo.remotes.origin
+    if request.method != "POST":
+        return HttpResponse("Use POST to trigger server update", status=405)
 
+    repo_path = os.environ.get("REPO_PATH", str(settings.BASE_DIR))
+
+    try:
+        repo = git.Repo(repo_path)
+        origin = repo.remotes.origin
         origin.pull()
         return HttpResponse("Updated code on PythonAnywhere")
-    else:
-        return HttpResponse("Couldn't update the code on PythonAnywhere")
+    except Exception as exc:
+        return HttpResponse(f"Update failed: {exc}", status=500)
 
 
 def hello_world(request):
