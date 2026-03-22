@@ -146,5 +146,7 @@ DEBUG = int(os.environ.get("DEBUG", default=int(DEBUG)))
 # 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space between each.
 # For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
 ALLOWED_HOSTS = os.environ.get(
-    "DJANGO_ALLOWED_HOSTS", "localhost 127.0.0.1 [::1]"
+    "DJANGO_ALLOWED_HOSTS", "localhost 127.0.0.1 [::1] ",
+    "bac-bookstore-api.herokuapp.com",
+    "maste0155.pythonanywhere.com"
 ).split(" ")

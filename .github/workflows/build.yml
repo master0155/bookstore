@@ -4,28 +4,27 @@ on: [push]
 
 jobs:
   build:
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.13]
+        python-version: [3.8, 3.9]
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v2
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-        cache: pip
 
     - name: Install poetry
       run: |
+        python -m ensurepip
         python -m pip install --upgrade pip
-        python -m pip install "poetry>=2,<3"
+        python -m pip install --upgrade poetry
+
     - name: View poetry --help
       run: poetry --help
 
