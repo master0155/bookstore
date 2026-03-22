@@ -22,6 +22,7 @@ from django.urls import re_path
 from django.urls import include
 from django.conf import settings
 from rest_framework.authtoken.views import obtain_auth_token
+from bookstore.views import update
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -34,6 +35,7 @@ urlpatterns = [
     path('bookstore/', include('product.urls')),
     path('bookstore/', include('order.urls')),
     path('api-token-auth/', obtain_auth_token),
+    path('bookstore/update_server/', update, name='update_server'),
 ]
 
 if settings.DEBUG:
