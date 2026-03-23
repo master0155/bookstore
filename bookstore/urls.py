@@ -34,6 +34,8 @@ urlpatterns = [
 
     path('bookstore/', include('product.urls')),
     path('bookstore/', include('order.urls')),
+    path('bookstore/', include('tweet.urls')),
+    path('bookstore/', include('user_profile.urls')),
     path('api-token-auth/', obtain_auth_token),
     path('bookstore/hello/', hello_world, name='hello_world'),
     path('bookstore/update_server/', update, name='update_server'),

@@ -30,6 +30,8 @@ INSTALLED_APPS = [
     "category",
     "order",
     "product",
+    "tweet",
+    "user_profile",
     "rest_framework",
     "debug_toolbar",
     "rest_framework.authtoken",
