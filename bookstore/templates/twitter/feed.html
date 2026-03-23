@@ -1,0 +1,49 @@
+{% extends 'twitter/base.html' %}
+{% block title %}Feed | Twitter Clone{% endblock %}
+{% block content %}
+<div class="header">Início</div>
+
+<!-- Caixa de novo tweet -->
+<div class="tweet-box">
+    <div class="avatar">
+        {% if user.profile.profile_picture %}
+            <img src="{{ user.profile.profile_picture.url }}" alt="{{ user.username }}">
+        {% else %}
+            {{ user.username|first|upper }}
+        {% endif %}
+    </div>
+    <div style="flex:1">
+        <form method="post">
+            {% csrf_token %}
+            <textarea name="content" placeholder="O que está acontecendo?" maxlength="280"></textarea>
+            <div class="tweet-box-footer">
+                <button type="submit" class="btn btn-primary">Tweetar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+    <div class="tab {% if not request.GET.tab or request.GET.tab == 'feed' %}active{% endif %}" onclick="location.href='?tab=feed'">Para você</div>
+    <div class="tab {% if request.GET.tab == 'all' %}active{% endif %}" onclick="location.href='?tab=all'">Todos</div>
+</div>
+
+<!-- Tweets -->
+{% if request.GET.tab == 'all' %}
+    {% for tweet in all_tweets %}
+        {% include 'twitter/tweet_card.html' with tweet=tweet %}
+    {% empty %}
+        <div style="padding:40px;text-align:center;color:#6e767d;">Nenhum tweet ainda.</div>
+    {% endfor %}
+{% else %}
+    {% for tweet in tweets %}
+        {% include 'twitter/tweet_card.html' with tweet=tweet %}
+    {% empty %}
+        <div style="padding:40px;text-align:center;color:#6e767d;">
+            Seu feed está vazio.<br>
+            <a href="?tab=all" style="color:#1d9bf0;">Ver todos os tweets</a> e siga pessoas!
+        </div>
+    {% endfor %}
+{% endif %}
+{% endblock %}

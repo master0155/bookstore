@@ -1,0 +1,65 @@
+{% load tz %}
+<div class="tweet">
+    <a href="{% url 'profile_user' tweet.author.username %}">
+        <div class="avatar">
+            {% if tweet.author.profile.profile_picture %}
+                <img src="{{ tweet.author.profile.profile_picture.url }}" alt="{{ tweet.author.username }}">
+            {% else %}
+                {{ tweet.author.username|first|upper }}
+            {% endif %}
+        </div>
+    </a>
+    <div class="tweet-content">
+        <div>
+            <a href="{% url 'profile_user' tweet.author.username %}" class="tweet-author">{{ tweet.author.get_full_name|default:tweet.author.username }}</a>
+            <span class="tweet-username">@{{ tweet.author.username }}</span>
+        </div>
+        <div class="tweet-text">{{ tweet.content }}</div>
+        <div class="tweet-time">{{ tweet.created_at|date:"d/m/Y H:i" }}</div>
+
+        <!-- Ações -->
+        <div class="tweet-actions">
+            <!-- Curtir -->
+            <form method="post" action="{% url 'like_tweet' tweet.id %}" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}{% if request.GET.tab %}?tab={{ request.GET.tab }}{% endif %}">
+                {% with liked=tweet.likes.all %}
+                <button type="submit" class="tweet-action {% if request.user in liked|slice:':100' %}liked{% endif %}">
+                    {% if tweet.likes.all|length > 0 and request.user in tweet.likes.all %}❤{% else %}🤍{% endif %}
+                    {{ tweet.likes.count }}
+                </button>
+                {% endwith %}
+            </form>
+
+            <!-- Comentários (toggle) -->
+            <button class="tweet-action" onclick="toggleComments('comments-{{ tweet.id }}')">
+                💬 {{ tweet.comments.count }}
+            </button>
+        </div>
+
+        <!-- Seção de comentários -->
+        <div id="comments-{{ tweet.id }}" style="display:none; margin-top:12px;">
+            {% for comment in tweet.comments.all %}
+            <div class="comment">
+                <div class="comment-content">
+                    <span class="comment-author">@{{ comment.author.username }}</span>
+                    <span class="comment-text">{{ comment.content }}</span>
+                </div>
+            </div>
+            {% endfor %}
+            <form method="post" action="{% url 'comment_tweet' tweet.id %}" class="comment-form">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}{% if request.GET.tab %}?tab={{ request.GET.tab }}{% endif %}">
+                <input type="text" name="content" placeholder="Escreva um comentário..." maxlength="280">
+                <button type="submit" class="btn btn-primary btn-sm">Enviar</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleComments(id) {
+    var el = document.getElementById(id);
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+</script>

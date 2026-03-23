@@ -1,0 +1,97 @@
+{% extends 'twitter/base.html' %}
+{% block title %}@{{ profile_user.username }} | Twitter Clone{% endblock %}
+{% block content %}
+<div class="header">
+    <a href="{% url 'feed' %}" style="color:#fff;margin-right:16px;">←</a>
+    {{ profile_user.get_full_name|default:profile_user.username }}
+</div>
+
+<div class="profile-header">
+    <div class="profile-banner"></div>
+    <div class="profile-info">
+        <div class="profile-avatar">
+            {% if profile.profile_picture %}
+                <img src="{{ profile.profile_picture.url }}" alt="{{ profile_user.username }}">
+            {% else %}
+                {{ profile_user.username|first|upper }}
+            {% endif %}
+        </div>
+        {% if profile_user == request.user %}
+            <!-- Botão para mostrar/esconder formulário de edição -->
+            <button class="btn btn-outline" onclick="toggleEdit()">Editar perfil</button>
+        {% else %}
+            <form method="post">
+                {% csrf_token %}
+                {% if is_following %}
+                    <input type="hidden" name="action" value="unfollow">
+                    <button type="submit" class="btn btn-danger">Seguindo</button>
+                {% else %}
+                    <input type="hidden" name="action" value="follow">
+                    <button type="submit" class="btn btn-primary">Seguir</button>
+                {% endif %}
+            </form>
+        {% endif %}
+    </div>
+
+    <div class="profile-name">{{ profile_user.get_full_name|default:profile_user.username }}</div>
+    <div class="profile-handle">@{{ profile_user.username }}</div>
+    {% if profile.bio %}<div class="profile-bio">{{ profile.bio }}</div>{% endif %}
+
+    <div class="profile-stats">
+        <div class="profile-stat"><span>{{ following_count }}</span> Seguindo</div>
+        <div class="profile-stat"><span>{{ followers_count }}</span> Seguidores</div>
+        <div class="profile-stat"><span>{{ tweets.count }}</span> Tweets</div>
+    </div>
+</div>
+
+<!-- Formulário de edição de perfil (oculto por padrão) -->
+{% if profile_user == request.user %}
+<div id="edit-form" class="edit-form" style="display:none;">
+    <h3>Editar perfil</h3>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="update_profile">
+        <div class="form-group">
+            <label>Nome</label>
+            <input type="text" name="first_name" class="form-control" placeholder="Seu nome" value="{{ request.user.first_name }}">
+        </div>
+        <div class="form-group">
+            <label>Sobrenome</label>
+            <input type="text" name="last_name" class="form-control" placeholder="Seu sobrenome" value="{{ request.user.last_name }}">
+        </div>
+        <div class="form-group">
+            <label>Bio</label>
+            <input type="text" name="bio" class="form-control" placeholder="Sobre você" value="{{ profile.bio|default:'' }}">
+        </div>
+        <div class="form-group">
+            <label>Foto de perfil</label>
+            <input type="file" name="profile_picture" class="form-control" accept="image/*">
+        </div>
+        <div class="form-group">
+            <label>Nova senha (deixe em branco para não alterar)</label>
+            <input type="password" name="new_password" class="form-control" placeholder="Nova senha">
+        </div>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <button type="button" class="btn btn-outline" onclick="toggleEdit()" style="margin-left:10px;">Cancelar</button>
+    </form>
+</div>
+{% endif %}
+
+<!-- Tweets do perfil -->
+<div class="tabs" style="margin-top:0;">
+    <div class="tab active">Tweets</div>
+</div>
+
+{% for tweet in tweets %}
+    {% include 'twitter/tweet_card.html' with tweet=tweet %}
+{% empty %}
+    <div style="padding:40px;text-align:center;color:#6e767d;">Nenhum tweet ainda.</div>
+{% endfor %}
+
+<script>
+function toggleEdit() {
+    var form = document.getElementById('edit-form');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+</script>
+{% endblock %}

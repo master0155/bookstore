@@ -1,5 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
@@ -11,12 +12,21 @@ from tweet.serializers import TweetSerializer, CommentSerializer, LikeSerializer
 class TweetViewSet(ModelViewSet):
     serializer_class = TweetSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
 
     def get_queryset(self):
         return Tweet.objects.all().order_by('-created_at')
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def feed(self, request):
+        """Retorna tweets apenas das pessoas que o usuário segue"""
+        following_users = request.user.profile.following.all()
+        tweets = Tweet.objects.filter(author__in=following_users).order_by('-created_at')
+        serializer = self.get_serializer(tweets, many=True, context={'request': request})
+        return Response(serializer.data)
 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def like(self, request, pk=None):
