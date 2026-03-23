@@ -21,8 +21,13 @@ from django.urls import path
 from django.urls import re_path
 from django.urls import include
 from django.conf import settings
+from django.conf.urls.static import static
 from rest_framework.authtoken.views import obtain_auth_token
 from bookstore.views import hello_world, update
+from bookstore.frontend_views import (
+    login_view, register_view, logout_view,
+    feed_view, profile_view, like_tweet, comment_tweet,
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -39,6 +44,16 @@ urlpatterns = [
     path('api-token-auth/', obtain_auth_token),
     path('bookstore/hello/', hello_world, name='hello_world'),
     path('bookstore/update_server/', update, name='update_server'),
+
+    # Frontend HTML
+    path('', feed_view, name='feed'),
+    path('login/', login_view, name='login'),
+    path('register/', register_view, name='register'),
+    path('logout/', logout_view, name='logout'),
+    path('profile/', profile_view, name='profile'),
+    path('profile/<str:username>/', profile_view, name='profile_user'),
+    path('tweet/<int:tweet_id>/like/', like_tweet, name='like_tweet'),
+    path('tweet/<int:tweet_id>/comment/', comment_tweet, name='comment_tweet'),
 ]
 
 if settings.DEBUG:
@@ -46,3 +61,4 @@ if settings.DEBUG:
     urlpatterns += [
         path("__debug__/", include(debug_toolbar.urls)),
     ]
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

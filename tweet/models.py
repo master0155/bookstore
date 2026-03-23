@@ -7,9 +7,34 @@ class Tweet(models.Model):
     content = models.TextField(max_length=280)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         ordering = ['-created_at']
-    
+
     def __str__(self):
         return f"{self.author.username} - {self.content[:50]}"
+
+
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes')
+    tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE, related_name='likes')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'tweet')
+
+    def __str__(self):
+        return f"{self.user.username} curtiu tweet {self.tweet.id}"
+
+
+class Comment(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
+    tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE, related_name='comments')
+    content = models.TextField(max_length=280)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"{self.author.username} comentou no tweet {self.tweet.id}"

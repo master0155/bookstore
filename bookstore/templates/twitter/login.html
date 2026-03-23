@@ -1,0 +1,29 @@
+{% extends 'twitter/base.html' %}
+{% block auth_content %}
+<div class="auth-container">
+    <div class="auth-box">
+        <div class="auth-logo">𝕏</div>
+        <h1 class="auth-title">Entrar no Twitter Clone</h1>
+        {% if messages %}
+            {% for message in messages %}
+            <div class="message error">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Usuário</label>
+                <input type="text" name="username" class="form-control" placeholder="Seu usuário" required autofocus>
+            </div>
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" name="password" class="form-control" placeholder="Sua senha" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;font-size:16px;padding:14px;">Entrar</button>
+        </form>
+        <div class="auth-link">
+            Não tem conta? <a href="{% url 'register' %}">Criar conta</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
